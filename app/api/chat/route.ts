@@ -4,18 +4,23 @@ export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
     
-    // Get the latest user message
-    const latestMessage = messages[messages.length - 1];
-    
-    if (!latestMessage?.content) {
-      return new Response('Message content is required', { status: 400 });
+    if (!messages || messages.length === 0) {
+      return new Response('Messages are required', { status: 400 });
     }
     
     // Get the weather agent from Mastra
     const agent = mastra.getAgent('weatherAgent');
     
-    // Generate response using the weather agent
-    const result = await agent.generate(latestMessage.content);
+    // Convert the chat messages to the format expected by Mastra
+    // For multi-turn conversation, we'll send the full conversation history
+    const conversationHistory = messages.map((msg: any) => ({
+      role: msg.role,
+      content: msg.content
+    }));
+    
+    // Generate response using the weather agent with full conversation context
+    // The agent's memory system will automatically maintain context across turns
+    const result = await agent.generate(conversationHistory);
     
     // Create a streaming response that's compatible with useChat
     const encoder = new TextEncoder();
