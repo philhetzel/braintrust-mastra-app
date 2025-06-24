@@ -1,6 +1,8 @@
 'use client';
 
 import { useChat } from 'ai/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export function Chat() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
@@ -9,7 +11,7 @@ export function Chat() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <div className="mx-auto max-w-2xl py-24">
+      <div className="mx-auto max-w-4xl py-24">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Weather Chat Assistant</h1>
           <p className="text-gray-300">Ask me about the weather in any city around the world!</p>
@@ -34,15 +36,44 @@ export function Chat() {
                 }`}
               >
                 <div
-                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                  className={`${
+                    message.role === 'user' 
+                      ? 'max-w-xs lg:max-w-md' 
+                      : 'max-w-sm lg:max-w-lg xl:max-w-xl'
+                  } px-4 py-2 rounded-lg ${
                     message.role === 'user'
                       ? 'bg-blue-600 text-white'
                       : 'bg-gray-700 text-gray-100 border border-gray-600'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">
-                    {message.content}
-                  </p>
+                  {message.role === 'user' ? (
+                    <p className="text-sm whitespace-pre-wrap">
+                      {message.content}
+                    </p>
+                  ) : (
+                    <div className="text-sm prose prose-invert prose-sm max-w-none">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          h2: ({node, ...props}) => <h2 className="text-base font-semibold text-white mb-2 mt-3 first:mt-0" {...props} />,
+                          h3: ({node, ...props}) => <h3 className="text-sm font-semibold text-white mb-1 mt-2" {...props} />,
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0 text-gray-100" {...props} />,
+                          ul: ({node, ...props}) => <ul className="mb-2 pl-4 space-y-1" {...props} />,
+                          li: ({node, ...props}) => <li className="text-gray-100" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-semibold text-white" {...props} />,
+                          code: ({node, ...props}: any) => {
+                            const isInline = !props.className?.includes('language-');
+                            return isInline 
+                              ? <code className="bg-gray-600 px-1 py-0.5 rounded text-xs font-mono text-gray-200" {...props} />
+                              : <code className="block bg-gray-600 p-2 rounded text-xs font-mono text-gray-200 overflow-x-auto" {...props} />;
+                          },
+                          a: ({node, ...props}) => <a className="text-blue-300 hover:text-blue-200 underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

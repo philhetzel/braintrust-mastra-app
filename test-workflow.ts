@@ -15,8 +15,10 @@ async function testWeatherAgent() {
       maxSteps: 5 // Allow multiple tool calls
     });
     
-    console.log('Agent Response:');
+    console.log('Agent Response (Markdown formatted):');
+    console.log('=====================================');
     console.log(response.text);
+    console.log('=====================================');
     
   } catch (error) {
     console.error('Error running agent:', error);

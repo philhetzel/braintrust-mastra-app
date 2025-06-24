@@ -42,12 +42,32 @@ export const weatherTool = createTool({
 });
 
 const getWeather = wrapTraced(async (location: string) => {
-  const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`;
-  const geocodingResponse = await fetch(geocodingUrl);
-  const geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
+  let geocodingData: GeocodingResponse;
+  let locationName = location;
+  
+  // Try the original location first
+  let geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`;
+  let geocodingResponse = await fetch(geocodingUrl);
+  geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
+
+  // If not found and location contains a comma (like "Camden, NJ"), try just the city name
+  if (!geocodingData.results?.[0] && location.includes(',')) {
+    const cityOnly = location.split(',')[0].trim();
+    geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityOnly)}&count=1`;
+    geocodingResponse = await fetch(geocodingUrl);
+    geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
+    locationName = cityOnly;
+  }
+
+  // If still not found, try with a broader search
+  if (!geocodingData.results?.[0]) {
+    geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=5`;
+    geocodingResponse = await fetch(geocodingUrl);
+    geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
+  }
 
   if (!geocodingData.results?.[0]) {
-    throw new Error(`Location '${location}' not found`);
+    throw new Error(`Location '${location}' not found. Please try a different location name or a major city nearby.`);
   }
 
   const { latitude, longitude, name } = geocodingData.results[0];
