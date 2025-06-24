@@ -1,5 +1,6 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
+import { wrapTraced } from 'braintrust';
 
 interface GeocodingResponse {
   results: {
@@ -40,7 +41,7 @@ export const weatherTool = createTool({
   },
 });
 
-const getWeather = async (location: string) => {
+const getWeather = wrapTraced(async (location: string) => {
   const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1`;
   const geocodingResponse = await fetch(geocodingUrl);
   const geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
@@ -65,7 +66,7 @@ const getWeather = async (location: string) => {
     conditions: getWeatherCondition(data.current.weather_code),
     location: name,
   };
-};
+}, {name: "getWeather", type: "tool"});
 
 function getWeatherCondition(code: number): string {
   const conditions: Record<number, string> = {

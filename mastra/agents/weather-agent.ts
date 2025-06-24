@@ -3,6 +3,8 @@ import { Agent } from '@mastra/core/agent';
 import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
 import { weatherTool } from '../tools/weather-tool';
+import { weatherActivitiesTool } from '../tools/weather-activities-tool';
+import { wrapAISDKModel } from 'braintrust';
 
 export const weatherAgent = new Agent({
   name: 'Weather Agent',
@@ -16,10 +18,10 @@ export const weatherAgent = new Agent({
       - Include relevant details like humidity, wind conditions, and precipitation
       - Keep responses concise but informative
 
-      Use the weatherTool to fetch current weather data.
+      Use the weatherTool to fetch current weather data and the weatherActivitiesTool to find activities suitable for the current weather conditions.
 `,
-  model: openai('gpt-4o-mini'),
-  tools: { weatherTool },
+  model: wrapAISDKModel(openai('gpt-4o-mini')),
+  tools: { weatherTool, weatherActivitiesTool },
   memory: new Memory({
     storage: new LibSQLStore({
       url: 'file:../mastra.db', // path is relative to the .mastra/output directory
