@@ -84,18 +84,6 @@ export async function POST(req: Request) {
         let inputMessages: any[] = [];
         let outputMessages: any[] = [];
 
-        // Debug: Let's see what we're working with
-        console.log("=== DEBUGGING RESULT STRUCTURE ===");
-        console.log("result.response exists:", !!result.response);
-        console.log("result.response.messages exists:", !!(result.response && result.response.messages));
-        console.log("result.response.messages length:", result.response?.messages?.length || 0);
-        console.log("fullConversation length:", fullConversation.length);
-        console.log("fullConversation:", JSON.stringify(fullConversation, null, 2));
-        if (result.response?.messages) {
-          console.log("result.response.messages:", JSON.stringify(result.response.messages, null, 2));
-        }
-        console.log("===================================");
-
         // Use the captured input state (before agent processing) and agent's response
         if (result.response && result.response.messages && result.response.messages.length > 0) {
           // Input: System message + conversation state up to and including user's latest message (captured before agent processing)
@@ -104,12 +92,7 @@ export async function POST(req: Request) {
           // Output: All of the agent's response messages (tool calls, tool results, assistant messages)
           outputMessages = result.response.messages;
 
-          console.log("Input messages count:", inputMessages.length);
-          console.log("Output messages count:", outputMessages.length);
-          console.log("Output message types:", outputMessages.map((msg: any, idx: number) => `${idx}: ${msg.role}`));
-          console.log("Last input message role:", inputMessages[inputMessages.length - 1]?.role);
         } else {
-          console.log("Fallback: Using result.text since result.response.messages not available");
           // Fallback: use captured input for input, and result.text for output
           inputMessages = inputForBraintrust;
           outputMessages = [{
