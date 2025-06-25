@@ -55,8 +55,9 @@ export async function POST(req: Request) {
 
         // Extract the full conversation from the result if available
         if (result.response && result.response.messages) {
-          // Update our stored conversation with the complete message history including tool calls
-          fullConversation = result.response.messages;
+          // result.response.messages contains only the agent's response (tool calls, tool results, assistant messages)
+          // We need to append these to our existing conversation to maintain full history
+          fullConversation.push(...result.response.messages);
           conversationStore.set(sessionId, fullConversation);
         } else {
           // Fallback: just add the assistant response
