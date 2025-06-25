@@ -18,15 +18,16 @@ A diagram of the Agent:
 
 ## Getting Started
 ### Prerequisites
-When running this example, you will need to provide the following to the `.env` file:
-- **OpenAI_API_KEY**: An OpenAI API Key. Used for LLM calls
-- **TAVILY_API_KEY**: A Tavily API Key. Used for the search tool.
-- **BRAINTRUST_API_KEY**: A Braintrust API Key. Used to interact with Braintrust for observability and evaluation.
-- **BRAINTRUST_PROJECT_NAME**: A unique Braintrust project name (e.g., "YourName_MastraApp"). Used to host your Braintrust assets.
+When running this example, you will need to provide the following to a `.env` file:
+- `**OpenAI_API_KEY**`: An OpenAI API Key. Used for LLM calls
+- `**TAVILY_API_KEY**`: A Tavily API Key. Used for the search tool.
+- `**BRAINTRUST_API_KEY**`: A Braintrust API Key. Used to interact with Braintrust for observability and evaluation.
+- `**BRAINTRUST_PROJECT_NAME**`: A unique Braintrust project name (e.g., "YourName_MastraApp"). Used to host your Braintrust assets.
+There is a file named `.env.example` to show how this would look in your repo. Create a file called `.env` and assign values for these environment variables.
 
 ### Setting up the development environment
 
-#### Alter your `.env` file
+#### Create your `.env` file
 Make sure that your `.env` file has values for the four environment variables listed above
 
 #### Run the Next.js app
