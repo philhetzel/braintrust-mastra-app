@@ -38,7 +38,7 @@ const getNearbyCities = wrapTraced(async (location: string) => {
         population: z.number().optional(),
       })),
     }),
-    prompt: `You are a geography expert. Given the city "${location}", suggest 5-8 nearby cities that are within about an hour's drive (approximately 60-80km or 40-50 miles).
+         prompt: `You are a geography expert. Given the city "${location}", suggest 2 nearby cities that are within about an hour's drive (approximately 60-80km or 40-50 miles).
 
 Requirements:
 - Only include real cities that actually exist
