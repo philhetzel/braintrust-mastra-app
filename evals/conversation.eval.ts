@@ -7,6 +7,8 @@ dotenv.config();
 const projectName = process.env.BRAINTRUST_PROJECT_NAME as string;
 
 async function task(input: any, hooks: any) {
+
+    // Run the Mastra agent and gather results
     const agent = mastra.getAgent("weatherAgent");
     const result = await agent.generate(input);
 
@@ -22,6 +24,7 @@ async function task(input: any, hooks: any) {
         return false;
     });
     
+    // write tool call and tool result messages to task metadata
     hooks.metadata.eval_tool_info = toolInfo;
     
     // Return the final assistant's message
@@ -29,6 +32,8 @@ async function task(input: any, hooks: any) {
         .filter(msg => msg.role === 'assistant' && msg.content)
         .pop();
     
+
+    // Extract the content of the final assistant message and return as output
     const content = finalAssistantMessage?.content;
     if (typeof content === 'string') {
         return content;
@@ -44,6 +49,7 @@ async function task(input: any, hooks: any) {
 }
 
 async function toolCallCheck({ output, expected, inputs, metadata }: any) {
+    // If no tool info is found, skip the scorer
     if (!metadata.eval_tool_info || !metadata.tool_info) {
         return null;
     }
@@ -91,6 +97,7 @@ async function toolCallCheck({ output, expected, inputs, metadata }: any) {
     const overlap = [...expectedTools].filter(tool => actualTools.has(tool)).length;
     const score = overlap / expectedTools.size;
     
+    // return the overlap score and metadata about the calculation
     return {
         score: score,
         name: "toolCallCheck",
@@ -134,7 +141,8 @@ async function faithfulnessCheck({ output, expected, input, metadata }: any) {
     // Extract descriptions from weatherActivitiesTool results
     const descriptions: string[] = [];
     
-    if (metadata.tool_info) {
+    // gather context from the Tavily activity search 
+    if (metadata.eval_tool_info) {
         metadata.tool_info.forEach((msg: any) => {
             if (msg.content && Array.isArray(msg.content)) {
                 msg.content.forEach((contentItem: any) => {
