@@ -49,9 +49,9 @@ You'll need to configure a Braintrust project and Braintrust dataset. This repos
 npm run setup
 ```
 
-##What is an Eval?
+## What is an Eval?
 
-###Description
+### Description
 An Eval is a way to judge the quality of some task or function's output. Usually that task is an LLM and prompt but that is not always the case. Evals are made up of three things:
 - **Data**: An array of inputs that you want to place into a task to create outputs. Can also include the expected values after a task transforms the input as well as any metadata of interest.
 - **Task**: Some function that takes an input and transforms it. Usually an LLM and prompt but can be either more or less complex.
