@@ -38,6 +38,15 @@ export async function POST(req: Request) {
         // Get the weather agent from Mastra
         const agent = mastra.getAgent("weatherAgent");
 
+        // Capture the input state BEFORE agent processing (for Braintrust logging)
+        const inputForBraintrust = [
+          {
+            role: 'system',
+            content: agent.getInstructions() || 'You are a helpful weather assistant.'
+          },
+          ...fullConversation  // This is the conversation state including user's message, BEFORE agent response
+        ];
+
         // Use the full conversation history (including previous tool calls)
         const result = await agent.generate(fullConversation);
 
@@ -70,10 +79,47 @@ export async function POST(req: Request) {
           },
         });
 
-        // Enhanced logging to Braintrust with full conversation context
+        // Create input: conversation state up to and including user's latest message + system message
+        let inputMessages: any[] = [];
+        let outputMessages: any[] = [];
+
+        // Debug: Let's see what we're working with
+        console.log("=== DEBUGGING RESULT STRUCTURE ===");
+        console.log("result.response exists:", !!result.response);
+        console.log("result.response.messages exists:", !!(result.response && result.response.messages));
+        console.log("result.response.messages length:", result.response?.messages?.length || 0);
+        console.log("fullConversation length:", fullConversation.length);
+        console.log("fullConversation:", JSON.stringify(fullConversation, null, 2));
+        if (result.response?.messages) {
+          console.log("result.response.messages:", JSON.stringify(result.response.messages, null, 2));
+        }
+        console.log("===================================");
+
+        // Use the captured input state (before agent processing) and agent's response
+        if (result.response && result.response.messages && result.response.messages.length > 0) {
+          // Input: System message + conversation state up to and including user's latest message (captured before agent processing)
+          inputMessages = inputForBraintrust;
+
+          // Output: All of the agent's response messages (tool calls, tool results, assistant messages)
+          outputMessages = result.response.messages;
+
+          console.log("Input messages count:", inputMessages.length);
+          console.log("Output messages count:", outputMessages.length);
+          console.log("Output message types:", outputMessages.map((msg: any, idx: number) => `${idx}: ${msg.role}`));
+          console.log("Last input message role:", inputMessages[inputMessages.length - 1]?.role);
+        } else {
+          console.log("Fallback: Using result.text since result.response.messages not available");
+          // Fallback: use captured input for input, and result.text for output
+          inputMessages = inputForBraintrust;
+          outputMessages = [{
+            role: 'assistant',
+            content: result.text
+          }];
+        }
+        
         span.log({
-          input:  fullConversation, // Complete conversation with tool calls,
-          output:  result.text,
+          input: inputMessages, // System + all messages before and including user's latest interaction
+          output: outputMessages, // All agent activity after user's latest interaction
         });
 
         // Log conversation history separately for debugging
