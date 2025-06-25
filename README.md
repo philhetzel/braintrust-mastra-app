@@ -121,8 +121,6 @@ You can also create a function to score the outputs of your Eval task. Like Eval
 
 ![Custom LLM-as-a-judge](assets/AnatomyOfCodeBasedScorer.png)
 
-## Running an Eval
-
 
 
 
