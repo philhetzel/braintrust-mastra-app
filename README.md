@@ -121,7 +121,11 @@ You can also create a function to score the outputs of your Eval task. Like Eval
 
 ![Custom LLM-as-a-judge](assets/AnatomyOfCodeBasedScorer.png)
 
-
+## Homework
+Here are some things you could improve in the current Evals if you want to learn by doing:
+1. The structureCheck scorer doesn't take into account situations where the user goes off topic. Adjust this eval to ignore these cases.
+2. Faithfulness takes into account the specific numbers (degrees, humidity, wind) in the expected value.
+3. Use LLM-as-a-judge to determine if suggested activities are really influenced by weather.
 
 
 
