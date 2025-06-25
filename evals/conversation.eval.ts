@@ -1,6 +1,10 @@
 import { Eval, initDataset} from "braintrust";
 import { mastra } from "../mastra";
 import {Faithfulness, LLMClassifierFromTemplate} from "autoevals";
+import dotenv from "dotenv";
+dotenv.config();
+
+const projectName = process.env.BRAINTRUST_PROJECT_NAME as string;
 
 async function task(input: any, hooks: any) {
     const agent = mastra.getAgent("weatherAgent");
@@ -163,8 +167,8 @@ async function faithfulnessCheck({ output, expected, input, metadata }: any) {
     });
 }
 
-Eval("MastraApp", {
+Eval(projectName, {
     task: task,
-    data: initDataset({project: "MastraApp", dataset: "WeatherActivityDataset"}),
+    data: initDataset({project: projectName, dataset: "WeatherActivityDataset"}),
     scores: [toolCallCheck, structureCheck, faithfulnessCheck]
 });

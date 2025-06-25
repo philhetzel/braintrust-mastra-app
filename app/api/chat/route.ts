@@ -1,7 +1,9 @@
 import { mastra } from "../../../mastra";
 import { initLogger, traced } from "braintrust";
+import dotenv from "dotenv";
+dotenv.config();
 
-const logger = initLogger({ projectName: "MastraApp" });
+const logger = initLogger({ projectName: process.env.BRAINTRUST_PROJECT_NAME });
 
 // In-memory storage for full conversations (in production, use Redis or database)
 const conversationStore = new Map<string, any[]>();
