@@ -49,6 +49,34 @@ You'll need to configure a Braintrust project and Braintrust dataset. This repos
 npm run setup
 ```
 
+##What is an Eval?
+
+###Description
+An Eval is a way to judge the quality of some task or function's output. Usually that task is an LLM and prompt but that is not always the case. Evals are made up of three things:
+- **Data**: An array of inputs that you want to place into a task to create outputs. Can also include the expected values after a task transforms the input as well as any metadata of interest.
+- **Task**: Some function that takes an input and transforms it. Usually an LLM and prompt but can be either more or less complex.
+- **Scorers**: A function that judges the quality of an output between 0 and 1. Judgement can be made via an LLM-as-a-judge or a deterministic code-based function.
+
+![What is an Eval](assets/WhatIsAnEval.png)
+
+### What does an Eval look like:
+
+```typescript
+Eval("Name of your Braintrust Project", {
+    task: task, // your task function's identifier. The Eval assumes that the tasks has arguments of input and hooks
+    data: initDataset({project: projectName, dataset: "WeatherActivityDataset"}), // your data with inputs and optional metadata and expected fields. This example pulls a dataset from Braintrust directly however you can load any data into an Eval as long as it has a field called "input"
+    scores: [toolCallCheck, structureCheck, faithfulnessCheck] // function identifiers for scores.
+});
+```
+
+### How do I run an Eval?
+
+In Braintrust, Eval experiments can be run via the command line. If writing your evals in TypeScript, you can initiate a Braintrust experiment by running:
+
+```bash
+npx braintrust eval path/to/eval/yourfilename.eval.ts
+```
+
 ## How do Eval tasks work?
 
 Eval tasks are a blank slate - usually Eval tasks are a combination of a prompt and a model; however, Eval tasks can be much more complicated (or even much simpler) than that! When setting up an Eval task, create a function that has two arguments: `input` and `hooks`.
@@ -85,9 +113,16 @@ Often you will want to create an LLM with a prompt that determines the quality o
 
 ## Creating a custom code-cased scorer
 
-You can also create a function to score the outputs of your Eval task. 
+You can also create a function to score the outputs of your Eval task. Like Eval tasks, code based scorers can be of arbitrary complexity. They can (but don't always have to) take four arguments:
+- `input`: Is derived from the evaluation case dataset's input field.
+- `output`: Is derived from the Eval task's returned output
+- `expected`: Is derived from the evaluation case dataset's expected field
+- `metadata`: Is derived from both the evaluation case dataset's metadata field OR any information written to `hooks.metadata` during the task's execution
 
-![Custom LLM-as-a-judge](assets/AnatomyOfLLMJudge.png)
+![Custom LLM-as-a-judge](assets/AnatomyOfCodeBasedScorer.png)
+
+## Running an Eval
+
 
 
 
