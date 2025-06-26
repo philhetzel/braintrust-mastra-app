@@ -13,4 +13,12 @@ export const mastra = new Mastra({
     name: 'Mastra',
     level: 'debug', // More detailed logging
   }),
+  telemetry: {
+    serviceName: 'braintrust-mastra-app',
+    enabled: true,
+    export: {
+      type: 'otlp',
+      // Endpoint and headers will be picked up from environment variables
+    },
+  },
 });

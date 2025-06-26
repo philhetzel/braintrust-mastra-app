@@ -1,7 +1,6 @@
 import { createWorkflow, createStep } from '@mastra/core/workflows';
 import { z } from 'zod';
 import { tavilySearchTool } from '../tools/tavily-tool';
-import { wrapTraced } from 'braintrust';
 
 // Step to generate weather-appropriate search query
 const generateSearchQuery = createStep({

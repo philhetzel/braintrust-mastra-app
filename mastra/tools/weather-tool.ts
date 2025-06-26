@@ -1,6 +1,5 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
-import { wrapTraced } from 'braintrust';
 
 interface GeocodingResponse {
   results: {
@@ -41,7 +40,7 @@ export const weatherTool = createTool({
   },
 });
 
-const getWeather = wrapTraced(async (location: string) => {
+const getWeather = async (location: string) => {
   let geocodingData: GeocodingResponse;
   let locationName = location;
   
@@ -86,7 +85,7 @@ const getWeather = wrapTraced(async (location: string) => {
     conditions: getWeatherCondition(data.current.weather_code),
     location: name,
   };
-}, {name: "getWeather", type: "tool"});
+};
 
 function getWeatherCondition(code: number): string {
   const conditions: Record<number, string> = {

@@ -1,6 +1,5 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
-import { wrapTraced } from 'braintrust';
 import { tavily } from '@tavily/core';
 
 export const tavilySearchTool = createTool({
@@ -25,7 +24,7 @@ export const tavilySearchTool = createTool({
   },
 });
 
-const searchTavily = wrapTraced(async (query: string, location?: string, maxResults: number = 5) => {
+const searchTavily = async (query: string, location?: string, maxResults: number = 5) => {
   // Initialize Tavily client with API key from environment
   const apiKey = process.env.TAVILY_API_KEY;
   if (!apiKey) {
@@ -58,4 +57,4 @@ const searchTavily = wrapTraced(async (query: string, location?: string, maxResu
   } catch (error) {
     throw new Error(`Tavily search failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-}, { name: "searchTavily", type: "tool" }); 
+}; 

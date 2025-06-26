@@ -9,7 +9,7 @@ The Mastra agent has three two tools available to it:
 - A tool that wraps around a [Mastra workflow](https://mastra.ai/en/docs/workflows/overview) which uses the [Tavily API](https://docs.tavily.com/welcome) to do a search and pull back interesting things to do based upon the city and weather.
 - A tool that uses a prompt to gather two nearby cities.
 
-Braintrust is performing logging and tracing on the Agent and associated tools. Engineers can run Braintrust Evals through the `evals/conversation.eval.ts` file.
+The application uses OpenTelemetry with Braintrust as the backend for observability, automatically tracing all Mastra operations including agent interactions and tool executions. Engineers can run Braintrust Evals through the `evals/conversation.eval.ts` file.
 
 A diagram of the Agent:
 
@@ -19,18 +19,41 @@ A diagram of the Agent:
 ## Getting Started
 ### Prerequisites
 When running this example, you will need to provide the following to a `.env` file:
-- `**OpenAI_API_KEY**`: An OpenAI API Key. Used for LLM calls
+- `**OPENAI_API_KEY**`: An OpenAI API Key. Used for LLM calls
 - `**TAVILY_API_KEY**`: A Tavily API Key. Used for the search tool.
-- `**BRAINTRUST_API_KEY**`: A Braintrust API Key. Used to interact with Braintrust for observability and evaluation.
+
+#### OpenTelemetry Configuration for Braintrust
+This application uses OpenTelemetry with Braintrust as the backend for observability and tracing:
+- `**OTEL_EXPORTER_OTLP_ENDPOINT**`: Set to `https://api.braintrust.dev/otel`
+- `**OTEL_EXPORTER_OTLP_HEADERS**`: Set to `"Authorization=Bearer <Your Braintrust API Key>, x-bt-parent=project_id:<Your Braintrust Project ID>"`
+
+#### Legacy Braintrust Configuration (for evaluations)
+- `**BRAINTRUST_API_KEY**`: A Braintrust API Key. Used to interact with Braintrust for evaluation.
 - `**BRAINTRUST_PROJECT_NAME**`: A unique Braintrust project name (e.g., "YourName_MastraApp"). Used to host your Braintrust assets.
-There is a file named `.env.example` to show how this would look in your repo. Create a file called `.env` and assign values for these environment variables.
+
+Create a file called `.env` and assign values for these environment variables.
+
+**Example .env file:**
+```bash
+# OpenTelemetry Configuration for Braintrust
+OTEL_EXPORTER_OTLP_ENDPOINT=https://api.braintrust.dev/otel
+OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer your-braintrust-api-key, x-bt-parent=project_id:your-project-id"
+
+# API Keys
+OPENAI_API_KEY=your-openai-api-key
+TAVILY_API_KEY=your-tavily-api-key
+
+# Legacy Braintrust Configuration (for evaluations)
+BRAINTRUST_API_KEY=your-braintrust-api-key
+BRAINTRUST_PROJECT_NAME=YourName_MastraApp
+```
 
 You will also need `node`/`npm` installed on your machine.
 
 ### Setting up the development environment
 
 #### Create your `.env` file
-Make sure that your `.env` file has values for the four environment variables listed above
+Make sure that your `.env` file has values for all the environment variables listed above. For the OpenTelemetry configuration, replace `<Your Braintrust API Key>` with your actual Braintrust API key and `<Your Braintrust Project ID>` with your project ID.
 
 #### Run the Next.js app
 To run the application, use the following command line script:

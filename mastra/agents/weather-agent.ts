@@ -5,7 +5,6 @@ import { LibSQLStore } from '@mastra/libsql';
 import { weatherTool } from '../tools/weather-tool';
 import { weatherActivitiesTool } from '../tools/weather-activities-tool';
 import { nearbyCitiesTool } from '../tools/nearby-cities-tool';
-import { wrapAISDKModel } from 'braintrust';
 
 export const weatherAgent = new Agent({
   name: 'Weather Agent',
@@ -53,7 +52,7 @@ export const weatherAgent = new Agent({
            - Find activities using weatherActivitiesTool
       4. Present all information in organized sections
 `,
-  model: wrapAISDKModel(openai('gpt-4o-mini')),
+  model: openai('gpt-4o-mini'),
   tools: { weatherTool, weatherActivitiesTool, nearbyCitiesTool },
 
 });

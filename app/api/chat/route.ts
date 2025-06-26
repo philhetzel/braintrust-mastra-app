@@ -1,9 +1,4 @@
 import { mastra } from "../../../mastra";
-import { initLogger, traced } from "braintrust";
-import dotenv from "dotenv";
-dotenv.config();
-
-initLogger({ projectName: process.env.BRAINTRUST_PROJECT_NAME });
 
 // In-memory storage for full conversations (in production, use Redis or database)
 const conversationStore = new Map<string, any[]>();
@@ -18,9 +13,7 @@ function getSessionId(req: Request): string {
 }
 
 export async function POST(req: Request) {
-  return traced(
-    async (span) => {
-      try {
+  try {
         const { messages } = await req.json();
         const sessionId = getSessionId(req);
 
@@ -103,14 +96,10 @@ export async function POST(req: Request) {
           }];
         }
         
-        span.log({
-          input: inputMessages, // System + all messages before and including user's latest interaction
-          output: outputMessages, // All agent activity after user's latest interaction
-        });
-
-        // Log conversation history separately for debugging
-
+        // Log conversation history for debugging
         console.log("Session ID:", sessionId);
+        console.log("Input messages:", inputMessages);
+        console.log("Output messages:", outputMessages);
 
         return new Response(stream, {
           headers: {
@@ -133,7 +122,4 @@ export async function POST(req: Request) {
           }
         );
       }
-    },
-    { name: "POST /api/chat", type: "llm" }
-  );
 }

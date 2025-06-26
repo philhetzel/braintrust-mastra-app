@@ -1,6 +1,5 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
-import { wrapTraced } from 'braintrust';
 import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 
@@ -25,7 +24,7 @@ export const nearbyCitiesTool = createTool({
   },
 });
 
-const getNearbyCities = wrapTraced(async (location: string) => {
+const getNearbyCities = async (location: string) => {
   const result = await generateObject({
     model: openai('gpt-4o-mini'),
     schema: z.object({
@@ -60,6 +59,6 @@ Please provide realistic suggestions based on actual geography.`,
   });
 
   return result.object;
-}, { name: "getNearbyCities", type: "tool" });
+};
 
  

@@ -1,6 +1,5 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
-import { wrapTraced } from 'braintrust';
 
 export const weatherActivitiesTool = createTool({
   id: 'get-weather-activities',
@@ -23,7 +22,7 @@ export const weatherActivitiesTool = createTool({
   },
 });
 
-const getWeatherActivities = wrapTraced(async (city: string, weather: string, mastra: any) => {
+const getWeatherActivities = async (city: string, weather: string, mastra: any) => {
   if (!mastra) {
     throw new Error('Mastra instance is required to access workflows');
   }
@@ -50,4 +49,4 @@ const getWeatherActivities = wrapTraced(async (city: string, weather: string, ma
   } else {
     throw new Error(`Workflow execution failed with status: ${result.status}`);
   }
-}, { name: "getWeatherActivities", type: "tool" }); 
+}; 
