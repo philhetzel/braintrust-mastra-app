@@ -1,4 +1,5 @@
+import { registerOTel } from "@vercel/otel";
+
 export function register() {
-  // Mastra handles OpenTelemetry setup automatically when telemetry is configured
-  // No additional setup needed here
-} 
+  registerOTel({ serviceName: "MastraAppTest" });
+}

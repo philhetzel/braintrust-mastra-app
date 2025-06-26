@@ -48,6 +48,11 @@ BRAINTRUST_API_KEY=your-braintrust-api-key
 BRAINTRUST_PROJECT_NAME=YourName_MastraApp
 ```
 
+**To find your Braintrust Project ID:**
+1. Navigate to your project's configuration page in Braintrust
+2. Find the **Copy Project ID** button at the bottom of the page
+3. Replace `your-project-id` in the OTEL_EXPORTER_OTLP_HEADERS with this ID
+
 You will also need `node`/`npm` installed on your machine.
 
 ### Setting up the development environment
