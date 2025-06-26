@@ -3,7 +3,7 @@ import { initLogger, traced } from "braintrust";
 import dotenv from "dotenv";
 dotenv.config();
 
-const logger = initLogger({ projectName: process.env.BRAINTRUST_PROJECT_NAME });
+initLogger({ projectName: process.env.BRAINTRUST_PROJECT_NAME });
 
 // In-memory storage for full conversations (in production, use Redis or database)
 const conversationStore = new Map<string, any[]>();
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         }
 
         // Get or initialize the full conversation history for this session
-        let fullConversation = conversationStore.get(sessionId) || [];
+        const fullConversation = conversationStore.get(sessionId) || [];
         
         // Add the new user message to the full conversation
         const newUserMessage = messages[messages.length - 1];
