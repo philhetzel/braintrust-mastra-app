@@ -55,9 +55,5 @@ export const weatherAgent = new Agent({
 `,
   model: wrapAISDKModel(openai('gpt-4o-mini')),
   tools: { weatherTool, weatherActivitiesTool, nearbyCitiesTool },
-  memory: new Memory({
-    storage: new LibSQLStore({
-      url: 'file:../mastra.db', // path is relative to the .mastra/output directory
-    }),
-  }),
+
 });
