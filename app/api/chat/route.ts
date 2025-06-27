@@ -1,12 +1,4 @@
 import { mastra } from "../../../mastra";
-import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-
-const provider = new NodeTracerProvider();
-// ... register exporter, resources, etc.
-
-provider.register();
-
-
 
 // In-memory storage for full conversations (in production, use Redis or database)
 const conversationStore = new Map<string, any[]>();
@@ -22,6 +14,11 @@ function getSessionId(req: Request): string {
 
 export async function POST(req: Request) {
   try {
+        // Debug environment and telemetry setup
+        console.log('Environment:', process.env.NODE_ENV);
+        console.log('BRAINTRUST_API_KEY exists:', !!process.env.BRAINTRUST_API_KEY);
+        console.log('OTEL_EXPORTER_OTLP_ENDPOINT:', process.env.OTEL_EXPORTER_OTLP_ENDPOINT);
+        
         const { messages } = await req.json();
         const sessionId = getSessionId(req);
 
@@ -129,9 +126,5 @@ export async function POST(req: Request) {
             status: 500,
           }
         );
-      } finally {
-          // Later, when you want to flush:
-          await new Promise(resolve => setTimeout(resolve, 100)); 
-          await provider.forceFlush();
       }
 }
