@@ -131,6 +131,7 @@ export async function POST(req: Request) {
         );
       } finally {
           // Later, when you want to flush:
+          await new Promise(resolve => setTimeout(resolve, 100)); 
           await provider.forceFlush();
       }
 }
