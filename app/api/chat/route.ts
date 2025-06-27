@@ -1,4 +1,12 @@
 import { mastra } from "../../../mastra";
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+
+const provider = new NodeTracerProvider();
+// ... register exporter, resources, etc.
+
+provider.register();
+
+
 
 // In-memory storage for full conversations (in production, use Redis or database)
 const conversationStore = new Map<string, any[]>();
@@ -121,5 +129,8 @@ export async function POST(req: Request) {
             status: 500,
           }
         );
+      } finally {
+          // Later, when you want to flush:
+          await provider.forceFlush();
       }
 }
