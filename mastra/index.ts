@@ -12,15 +12,5 @@ export const mastra = new Mastra({
   logger: new PinoLogger({
     name: 'Mastra',
     level: 'debug', // More detailed logging
-  }),
-  telemetry: {
-    serviceName: 'MastraAppTest',
-    enabled: true,
-    sampling: {
-      type: 'always_on',
-    },
-      // Alternative: For Vercel's built-in observability, use:
-      // endpoint: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
-      // headers: {} // Vercel handles auth automatically
-  },
+  })
 });
