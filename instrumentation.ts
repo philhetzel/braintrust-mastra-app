@@ -13,17 +13,3 @@ export function register() {
     });
   }
 }
-
-export const onRequestError = async (
-  err: { digest: string } & Error,
-  _request: {
-    path: string;
-    method: string;
-    headers: { [key: string]: string };
-  },
-  _context: {
-    renderSource: 'react-server-components' | 'react-server-components-payload' | 'server-side-rendering';
-  }
-) => {
-  console.error(`Request error: ${err.message}`);
-};
