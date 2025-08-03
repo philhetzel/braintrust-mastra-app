@@ -1,5 +1,7 @@
 import { mastra } from "../../../mastra";
+import { getChampionInstructions, WeatherRuntimeContext } from "../../../mastra/agents/weather-agent";
 import { initLogger, traced } from "braintrust";
+import { RuntimeContext } from "@mastra/core/runtime-context";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -37,6 +39,26 @@ export async function POST(req: Request) {
           fullConversation.push(newUserMessage);
         }
 
+        // Get champion instructions from Braintrust
+        let instructions;
+        try {
+          console.log('[route.ts] Attempting to fetch champion instructions...');
+          instructions = await getChampionInstructions();
+          console.log('[route.ts] Successfully fetched champion instructions:', instructions.substring(0, 100) + '...');
+        } catch (error) {
+          console.error('[route.ts] Failed to fetch champion instructions:', error);
+          console.log('[route.ts] Error details:', {
+            message: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
+          });
+          instructions = 'You are a helpful weather assistant that provides accurate weather information and activity recommendations.';
+          console.log('[route.ts] Using default instructions');
+        }
+
+        // Create runtime context with instructions
+        const runtimeContext = new RuntimeContext<WeatherRuntimeContext>();
+        runtimeContext.set("instructions", instructions);
+
         // Get the weather agent from Mastra
         const agent = mastra.getAgent("weatherAgent");
 
@@ -44,13 +66,13 @@ export async function POST(req: Request) {
         const inputForBraintrust = [
           {
             role: 'system',
-            content: agent.getInstructions() || 'You are a helpful weather assistant.'
+            content: instructions
           },
           ...fullConversation  // This is the conversation state including user's message, BEFORE agent response
         ];
 
         // Use the full conversation history (including previous tool calls)
-        const result = await agent.generate(fullConversation);
+        const result = await agent.generate(fullConversation, { runtimeContext });
 
         // Log the full result object to see what's available
         console.log("Full Mastra result:", JSON.stringify(result, null, 2));

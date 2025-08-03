@@ -2,15 +2,26 @@ import { Eval, initDataset} from "braintrust";
 import { mastra } from "../mastra";
 import {Faithfulness, LLMClassifierFromTemplate} from "autoevals";
 import dotenv from "dotenv";
+import { RuntimeContext } from "@mastra/core/runtime-context";
+import { z } from "zod";
+import { WeatherRuntimeContext } from "../mastra/agents/weather-agent";
 dotenv.config();
 
 const projectName = process.env.BRAINTRUST_PROJECT_NAME as string;
 
-async function task(input: any, hooks: any) {
+// Default instructions
+const defaultInstructions = `
+      You are a helpful weather assistant that provides accurate weather information and activity recommendations.
 
+            `;
+
+async function task(input: any, hooks: any) {
+    const runtimeContext = new RuntimeContext<WeatherRuntimeContext>();
+ 
+    runtimeContext.set("instructions", hooks.parameters.instructions);
     // Run the Mastra agent and gather results
     const agent = mastra.getAgent("weatherAgent");
-    const result = await agent.generate(input);
+    const result = await agent.generate(input, {runtimeContext});
 
     const outputMessages = result.response.messages;
 
@@ -25,7 +36,18 @@ async function task(input: any, hooks: any) {
     });
     
     // write tool call and tool result messages to task metadata
+    if (!hooks) {
+        console.error('Hooks object is undefined');
+        throw new Error('Hooks object is required but was undefined');
+    }
+    
+    // Initialize metadata if it doesn't exist
+    if (!hooks.metadata) {
+        hooks.metadata = {};
+    }
+    
     hooks.metadata.eval_tool_info = toolInfo;
+    hooks.metadata.instructions = hooks.parameters.instructions;
     
     // Return the final assistant's message
     const finalAssistantMessage = outputMessages
@@ -142,8 +164,8 @@ async function faithfulnessCheck({ output, expected, input, metadata }: any) {
     const descriptions: string[] = [];
     
     // gather context from the Tavily activity search 
-    if (metadata.eval_tool_info) {
-        metadata.tool_info.forEach((msg: any) => {
+    if (metadata && metadata.eval_tool_info && metadata.tool_info) {
+        metadata.eval_tool_info.forEach((msg: any) => {
             if (msg.content && Array.isArray(msg.content)) {
                 msg.content.forEach((contentItem: any) => {
                     if (contentItem.toolName === 'weatherActivitiesTool' && 
@@ -176,7 +198,21 @@ async function faithfulnessCheck({ output, expected, input, metadata }: any) {
 }
 
 Eval(projectName, {
-    task: task,
+    experimentName: `weather-eval-${new Date().toISOString().split('T')[0]}`,
+    task: async (input: any, hooks: any) => {
+        // Store runtime values in test-case metadata
+        hooks.metadata.actualInstructions = hooks.parameters.instructions;
+        hooks.metadata.timestamp = new Date().toISOString();
+        
+        return task(input, hooks);
+    },
     data: initDataset({project: projectName, dataset: "WeatherActivityDataset"}),
-    scores: [toolCallCheck, structureCheck, faithfulnessCheck]
+    scores: [toolCallCheck, structureCheck, faithfulnessCheck],
+    parameters: {
+        instructions: z.string()
+        .describe("The instructions for the agent to follow")
+        .default(defaultInstructions)
+    },
+    metadata: {
+    }
 });
