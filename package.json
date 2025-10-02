@@ -20,7 +20,7 @@
     "@tavily/core": "^0.5.8",
     "ai": "^4.2.0",
     "autoevals": "^0.0.130",
-    "braintrust": "^0.3.6",
+    "braintrust": "^0.3.8",
     "mastra": "^0.10.6",
     "next": "15.3.4",
     "react": "^19.0.0",
